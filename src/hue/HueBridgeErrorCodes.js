@@ -1,0 +1,2 @@
+export const INVALID_PARAMETERS_ERROR_TYPE = 5;
+export const LINK_BUTTON_ERROR_TYPE = 101;
