@@ -1,9 +1,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-
-let greeting = <b>Hello World</b>;
+import {Application} from './ui-components';
 
 ReactDOM.render(
-    greeting,
+    <Application/>,
     document.getElementById('root')
 );
+
