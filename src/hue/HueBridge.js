@@ -1,11 +1,14 @@
 import {LINK_BUTTON_ERROR_TYPE} from './HueBridgeErrorCodes';
 import LinkButtonException from './LinkButtonException';
+import NotLoggedInException from './NotLoggedInException';
+import HueLight from './HueLight';
 
 export default class HueBridge
 {
     constructor(ipAddress, ajax) {
         this.ipAddress = ipAddress;
         this.ajax = ajax;
+        this.username = null;
     }
 
     authenticate() {
@@ -27,6 +30,27 @@ export default class HueBridge
             this.ajax.send(JSON.stringify({
                 devicetype: 'reactive-hue'
             }));
+        });
+    }
+
+    getLights() {
+        return new Promise((resolve, reject) => {
+            if (this.username == null) {
+                reject(new NotLoggedInException());
+            }
+
+            this.ajax.addEventListener('load', () => {
+                let response = JSON.parse(this.ajax.responseText);
+                let lights = Object.keys(response).map((lightId) => {
+                    return new HueLight(lightId, response[lightId]);
+                });
+
+                resolve(lights);
+            });
+
+            this.ajax.open('GET', 'http://' + this.ipAddress + '/api/' + this.username + '/lights');
+            this.ajax.setRequestHeader('Content-Type', 'application/json');
+            this.ajax.send();
         });
     }
 }
