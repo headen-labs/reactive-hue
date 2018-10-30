@@ -17,7 +17,8 @@ export default class HueBridge
                     return;
                 }
 
-                resolve(response[0].success.username);
+                this.username = response[0].success.username;
+                resolve();
             });
             
             this.ajax.open('POST', 'http://' + this.ipAddress + '/api');

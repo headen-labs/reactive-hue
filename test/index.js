@@ -18,12 +18,11 @@ describe("HueBridge", () => {
             let ajax = new xhr();
 
             let bridge = new HueBridge('172.0.0.1', ajax);
-            let authenticationPromise = bridge.authenticate().then((username) => {
+            let authenticationPromise = bridge.authenticate().then(() => {
                 expect(ajax.url).to.equal('http://172.0.0.1/api');
                 expect(ajax.method).to.equal('POST');
                 expect(ajax.requestHeaders['Content-Type']).to.equal('application/json;charset=utf-8');
                 expect(ajax.requestBody).to.equal(JSON.stringify({"devicetype": "reactive-hue"}));
-                expect(username).to.equal('abc123');
             }).then(done, done);
 
             ajax.respond(
@@ -49,6 +48,22 @@ describe("HueBridge", () => {
                 200,
                 { "Content-Type": "application/json" },
                 JSON.stringify(getHueErrorResponseJson(LINK_BUTTON_ERROR_TYPE, ""))
+            );
+        });
+
+        it('should save the username', (done) => {
+            let xhr = Sinon.useFakeXMLHttpRequest();
+            let ajax = new xhr();
+
+            let bridge = new HueBridge('172.0.0.1', ajax);
+            let authenticationPromise = bridge.authenticate().then((username) => {
+                expect(bridge.username).to.equal('abc123');
+            }).then(done, done);
+
+            ajax.respond(
+                200,
+                { "Content-Type": "application/json" },
+                JSON.stringify(getHueAuthenticationSuccessJson('abc123'))
             );
         });
     })
