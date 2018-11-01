@@ -13,7 +13,8 @@ export default class HueBridge
 
     authenticate() {
         return new Promise((resolve, reject) => {
-            this.ajax.addEventListener('load', () => {
+            let loadEvent = () => {
+                this.ajax.removeEventListener('load', loadEvent);
                 let response = JSON.parse(this.ajax.responseText);
                 if (response[0].error && response[0].error.type == LINK_BUTTON_ERROR_TYPE) {
                     reject(new LinkButtonException());
@@ -22,8 +23,10 @@ export default class HueBridge
 
                 this.username = response[0].success.username;
                 resolve();
-            });
-            
+            };
+
+            this.ajax.addEventListener('load', loadEvent);
+
             this.ajax.open('POST', 'http://' + this.ipAddress + '/api');
             this.ajax.setRequestHeader('Content-Type', 'application/json');
 
@@ -39,14 +42,17 @@ export default class HueBridge
                 reject(new NotLoggedInException());
             }
 
-            this.ajax.addEventListener('load', () => {
+            let loadEvent = () => {
+                this.ajax.removeEventListener('load', loadEvent);
                 let response = JSON.parse(this.ajax.responseText);
                 let lights = Object.keys(response).map((lightId) => {
                     return new HueLight(lightId, response[lightId]);
                 });
 
                 resolve(lights);
-            });
+            };
+
+            this.ajax.addEventListener('load', loadEvent);
 
             this.ajax.open('GET', 'http://' + this.ipAddress + '/api/' + this.username + '/lights');
             this.ajax.setRequestHeader('Content-Type', 'application/json');
