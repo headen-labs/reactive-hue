@@ -10,6 +10,7 @@ export default class HueBridgeSetUp extends React.Component {
     }
 
     render() {
+        let error = this.props.errorMessage ? <div class="alert alert-danger">{this.props.errorMessage}</div> : null;
         return (
             <div class="row">
                 <div class="col-4 offset-4 text-center">
@@ -21,6 +22,9 @@ export default class HueBridgeSetUp extends React.Component {
                         onChange={this._updateHostname}/>
                     <br/>
                     <button className="btn btn-lg btn-success" onClick={ () => this.props.connectClickHandler(this.state.hostname) }>Connect</button>
+                    <br/>
+                    <br/>
+                    {error}
                 </div>
             </div>
         );
