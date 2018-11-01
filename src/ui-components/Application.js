@@ -18,6 +18,18 @@ export default class Application extends React.Component {
         };
     }
 
+    componentDidMount() {
+        let storedHostname = window.localStorage.getItem('bridgeHostname');
+        let storedUsername = window.localStorage.getItem('bridgeUsername');
+
+        if (storedHostname && storedUsername) {
+            let bridge = new HueBridge(storedHostname, new XMLHttpRequest());
+            bridge.username = storedUsername;
+
+            this.setState({bridge: bridge});
+        }
+    }
+
     render() {
         let body = this._isBridgeConnected() ?
             <HueLightManager bridge={this.state.bridge}/> :
@@ -34,7 +46,11 @@ export default class Application extends React.Component {
     _handleBridgeConnect(hostname) {
         let bridge = new HueBridge(hostname, new XMLHttpRequest());
         bridge.authenticate().then(
-            () => this.setState({bridge: bridge}),
+            () => {
+                window.localStorage.setItem('bridgeHostname', hostname);
+                window.localStorage.setItem('bridgeUsername', bridge.username);
+                this.setState({bridge: bridge})
+            },
             (err) => {
                 if (err instanceof LinkButtonException) {
                     this.setState({bridge: null, errorMessage: 'Please press the button on your Hue bridge'});
