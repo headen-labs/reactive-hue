@@ -17,7 +17,7 @@ export default class HueLightManager extends React.Component {
 
     render() {
         let lightControls = this.state.lights ?
-            this.state.lights.map((light) => <HueLightControl light={light}/>) :
+            this.state.lights.map((light) => <HueLightControl bridge={this.props.bridge} light={light}/>) :
             <div class="col-12"><div class="alert alert-danger">No Lights Found</div></div>;
 
         return (
