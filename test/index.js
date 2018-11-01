@@ -126,7 +126,36 @@ describe("HueBridge", () => {
                 JSON.stringify(mockXhrResponseData)
             );
         });
-    })
+    });
+
+    describe("#updateLight", () => {
+        it('should make the correct AJAX calls', (done) => {
+            let xhr = Sinon.useFakeXMLHttpRequest();
+            let ajax = new xhr();
+
+            let bridge = new HueBridge('172.0.0.1', ajax);
+            bridge.username = 'abc123';
+
+            let light = new HueLight("1", getHueLightsDiscoveryJson()["1"]);
+            light.on = false;
+            light.brightness = 128;
+
+            bridge.updateLight(light).then(() => {
+                expect(ajax.url).to.equal('http://172.0.0.1/api/' + bridge.username + '/lights/' + light.id + '/state');
+                expect(ajax.method).to.equal('PUT');
+                expect(ajax.requestHeaders['Content-Type']).to.equal('application/json;charset=utf-8');
+                expect(ajax.requestBody).to.equal(JSON.stringify(
+                   {"on": false, "bri": 128}
+                ));
+            }).then(done, done);
+
+            ajax.respond(
+                200,
+                { "Content-Type": "application/json" },
+                ''
+            );
+        });
+    });
 });
 
 function getHueAuthenticationSuccessJson(username) {

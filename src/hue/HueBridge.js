@@ -53,4 +53,29 @@ export default class HueBridge
             this.ajax.send();
         });
     }
+
+    updateLight(light) {
+        return new Promise((resolve, reject) => {
+            if (this.username == null) {
+                reject(new NotLoggedInException());
+            }
+
+            let loadEvent = () => {
+                this.ajax.removeEventListener('load', loadEvent);
+                resolve();
+            };
+
+            this.ajax.addEventListener('load', loadEvent);
+            this.ajax.open('PUT', 'http://' + this.ipAddress + '/api/' + this.username + '/lights/' + light.id + '/state');
+            this.ajax.setRequestHeader('Content-Type', 'application/json');
+            this.ajax.send(JSON.stringify(this._buildLightStateUpdateBody(light)));
+        });
+    }
+
+    _buildLightStateUpdateBody(light) {
+        return {
+            "on": light.on,
+            "bri": light.brightness
+        };
+    }
 }
