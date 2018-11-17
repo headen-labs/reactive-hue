@@ -1,5 +1,6 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 module.exports = {
     entry: {
@@ -21,6 +22,13 @@ module.exports = {
                         presets: ['@babel/preset-react']
                     }
                 }
+            },
+            {
+                test: /\.css$/,
+                use: [
+                    MiniCssExtractPlugin.loader,
+                    'css-loader'
+                ]
             }
         ]
     },
@@ -29,6 +37,10 @@ module.exports = {
             template: path.resolve(__dirname, 'src/index.template.html'),
             xhtml: true,
             chunks: ['app']
+        }),
+        new MiniCssExtractPlugin({
+            filename: '[name].css',
+            chunkFilename: '[id].css'
         })
     ]
 };
